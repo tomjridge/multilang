@@ -1,0 +1,41 @@
+= Multilang
+
+== Introduction
+
+Suppose a file contains 2 different languages. For example, you might
+have Emacs lisp code, but the comments are in Asciidoc format. If the
+file is a lisp file, then it is hard to edit the comments using your
+favourite editor. If the file is an adoc file, it is hard to edit the
+code. The solution is to maintain two files: a lisp file and an
+asciidoc file, which represent two views of the same information. For example, here is some Emacs lisp code:
+
+[source,lisp]
+----
+include::el/mlang.el[]
+----
+
+And here is the same information as an Asciidoc file:
+
+[source,adoc]
+----
+include:el/mlang.adoc[]
+----
+
+
+== Building
+
+
+Multilang consists of two pieces:
+
+- a Scala program `multilang` which propagates changes from one file
+  to another
+
+- Emacs lisp code to make this usable from within Emacs (runs hook and
+  reverts buffers on save).
+
+To build the scala executable `multilang`, type `make`.
+
+For the emacs lisp code, you need to copy the contents of
+`el/mlang.el` to your emacs initialization file. You need to adjust
+the command to run `multilang` at this point.
+
