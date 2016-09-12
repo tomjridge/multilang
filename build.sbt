@@ -5,4 +5,3 @@ lazy val root = (project in file(".")).
     resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies += "com.lihaoyi" %% "upickle" % "0.4.1"
   )
-//
