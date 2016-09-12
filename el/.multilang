@@ -1,0 +1,12 @@
+[
+  [{"start":"//","end":"","ext":"md"},
+   {"start":"%%","end":"","ext":"tex"},
+   {"start":"//","end":"XX","ext":"scala"},
+   {"start":"#","end":"","ext":"org"},
+   {"start":";;","end":"","ext":"el"},
+   {"start":"//","end":"","ext":"adoc"}
+  ],
+  { "multilang":["org","adoc"],
+    "mlang":["el","adoc"]
+  }
+]

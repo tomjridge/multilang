@@ -1,0 +1,141 @@
+//el ;; -*- lexical-binding: t -*-
+//el 
+= Multilang
+Author: Tom Ridge
+
+
+== Introduction
+
+This is a simple script that allows you to edit multiple views of a
+single source document.
+
+For example, suppose you want to mix source code in emacs lisp with
+markdown documentation. You write a single file - let's say `xxx.el` -
+with markdown "special multilang" comments. For example:
+
+[source,lisp]
+--------------------------------------------------
+;;md A **very common** function
+(defun f () (message "Hello world!"))
+
+;;md This is some *markdown* documentation
+--------------------------------------------------
+
+You need to tell multilang about the comment syntaxes involved, and
+the files you wish to operate on. In a `.multilang` file, put
+something like:
+
+[source,json]
+----
+[
+  [{"start":"//","end":"","ext":"md"},
+   {"start":";;","end":"","ext":"el"}
+  ],
+  {"xxx":["md","el"]}
+]
+----
+
+This tells multilang to process `xxx.md` to produce `xxx.el`, and vice
+versa. Then, when `xxx.md` changes, you run `Multilang xxx.md`, and
+similarly when `xxx.el` changes, run `Multilang xxx.el`.
+
+To make this usable, you need to integrate with your editor. For
+example, emacs has a "after-save-hook" that enables you to run a
+command every time a file is saved. This can be used to execute
+`Multilang`. The following sections describe the emacs code to
+interface to `Multilang`.
+
+
+=== Multilang Emacs Lisp code (mlang.el)
+
+To use this code, call the function `multilang` on a buffer you wish
+to edit with multilang support. You also need `.multilang` set
+appropriately, and other related buffers should also have `multilang`
+called on them. Then, when saving the buffer, emacs will automatically
+run Multilang.
+
+
+=== Config // ----------------------------------------
+
+`mlang/buffers`: a list of buffers that we revert after running the
+hook
+
+`mlang/clear`: clear the buffer list (e.g. before working on another
+mlang doc)
+
+----
+//el 
+//el (defvar mlang/buffers '())
+//el 
+//el (defun mlang/clear ()
+//el   (interactive)
+//el   (setq mlang/buffers '()))
+//el 
+----
+
+`mlang/revert`: revert all buffers in `mlang/buffers`.
+
+----
+//el 
+//el (defun mlang/revert ()
+//el   (interactive)
+//el   (mapc ; revert relevant buffers - perhaps we want this in the scala?
+//el    (lambda (x) 
+//el      (with-current-buffer x 
+//el        (revert-buffer nil t)))
+//el    mlang/buffers))
+//el 
+----
+
+=== Save hook // ----------------------------------------
+
+On save, we run `Multilang` to propagate changes, and then revert all
+buffers in `mlang/buffers`. Note that we need the scala code
+`Multilang.scala`, and some way to run it (here we use a local `runsc`
+file, but you should use your own alternative).
+
+----
+//el 
+//el (defun mlang/hook ()
+//el   (interactive)
+//el   (let* 
+//el       ((bn (buffer-name)) ;; assume name of file
+//el        (cmd (format "runsc Multilang %s" bn))
+//el        ) ;; let-binds
+//el     (progn
+//el       (message cmd)
+//el       (shell-command cmd)
+//el       (mlang/revert)
+//el       (mlang/add-hook)))) ;; having reverted, we need to re-add the hook
+//el 
+----
+
+=== Add hook to buffers // ---------------------------------------- 
+
+----
+//el 
+//el (defun mlang/add-hook ()
+//el   (interactive)
+//el   (mapc 
+//el    (lambda (b)
+//el      (with-current-buffer b 
+//el        (add-hook 'after-save-hook 'mlang/hook nil t)))
+//el    mlang/buffers))
+//el 
+//el 
+//el ;; add hook to current buffer
+//el (defun multilang ()
+//el   (interactive)
+//el   (add-to-list 'mlang/buffers (current-buffer)) ;; add current buffer to mlang/buffers
+//el   (add-hook 'after-save-hook 'mlang/hook nil t))
+//el 
+----
+
+=== Full source of `mlang.el` // ----------------------------------------
+
+The full source is:
+
+[source,lisp]
+----
+include::mlang.el[]
+----
