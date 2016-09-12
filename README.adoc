@@ -3,25 +3,20 @@
 == Introduction
 
 Suppose a file contains 2 different languages. For example, you might
-have Emacs lisp code, but the comments are in Asciidoc format. If the
-file is a lisp file, then it is hard to edit the comments using your
-favourite editor. If the file is an adoc file, it is hard to edit the
-code. The solution is to maintain two files: a lisp file and an
-asciidoc file, which represent two views of the same information. For
-example, here is some Emacs lisp code with Asciidoc comments:
+have Emacs lisp code, but the comments are in Asciidoc format. 
 
-[source,lisp]
-----
-include::el/mlang.el[]
-----
+For example, here is some Emacs lisp code with Asciidoc comments:
+link:el/mlang.el[]
 
 And here is the same information as an Asciidoc file, but with Emacs
-lisp comments:
+lisp comments: link:el/mlang.adoc[]
 
-[source,adoc]
-----
-include:el/mlang.adoc[]
-----
+If the file is a lisp file, then it is hard to edit the comments using
+your favourite editor. If the file is an adoc file, it is hard to edit
+the code. The solution is to maintain two files: a lisp file and an
+Asciidoc file, which represent two views of the same information. Then
+you need some automatic way to propagate changes between the two
+views. This is what Multilang is for.
 
 
 == Building
