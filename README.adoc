@@ -38,4 +38,4 @@ the command to run `multilang` at this point.
 
 == Documentation
 
-Further documentation is in `el/mlang.adoc`
+Further documentation is in link:el/mlang.adoc[]
