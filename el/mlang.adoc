@@ -52,7 +52,7 @@ To use this code, call the function `multilang` on a buffer you wish
 to edit with multilang support. You also need `.multilang` set
 appropriately, and other related buffers should also have `multilang`
 called on them. Then, when saving the buffer, emacs will automatically
-run Multilang.
+run Multilang. 
 
 
 === Config // ----------------------------------------
@@ -63,6 +63,11 @@ hook
 `mlang/clear`: clear the buffer list (e.g. before working on another
 mlang doc)
 
+`run-multilang`: how to run multilang on your system
+
+[WARNING]
+You need to edit this function so that it runs multilang on your system
+
 ----
 //el 
 //el (defvar mlang/buffers '())
@@ -71,7 +76,21 @@ mlang doc)
 //el   (interactive)
 //el   (setq mlang/buffers '()))
 //el 
+//el ;; how to call the Scala multilang executable on your system, with
+//el ;; argument filename fn; FIXME EDIT THIS FOR YOUR LOCAL INSTALLATION
+//el (defun run-multilang (fn)
+//el   (interactive "P")
+//el   (format "runsc Multilang %s" fn))
+//el ;; you probably want: (format "multilang %s" fn)
+//el 
 ----
+
+=== Save hook // ----------------------------------------
+
+On save, we run `Multilang` to propagate changes, and then revert all
+buffers in `mlang/buffers`. Note that we need the scala code
+`Multilang.scala`, and some way to run it (here we use a local `runsc`
+file, but you should use your own alternative).
 
 `mlang/revert`: revert all buffers in `mlang/buffers`.
 
@@ -85,22 +104,11 @@ mlang doc)
 //el        (revert-buffer nil t)))
 //el    mlang/buffers))
 //el 
-----
-
-=== Save hook // ----------------------------------------
-
-On save, we run `Multilang` to propagate changes, and then revert all
-buffers in `mlang/buffers`. Note that we need the scala code
-`Multilang.scala`, and some way to run it (here we use a local `runsc`
-file, but you should use your own alternative).
-
-----
-//el 
 //el (defun mlang/hook ()
 //el   (interactive)
 //el   (let* 
-//el       ((bn (buffer-name)) ;; assume name of file
-//el        (cmd (format "runsc Multilang %s" bn))
+//el       (
+//el        (cmd (run-multilang (file-name-nondirectory (buffer-file-name))))
 //el        ) ;; let-binds
 //el     (progn
 //el       (message cmd)

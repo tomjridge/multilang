@@ -493,6 +493,21 @@ hook</p>
 <p><code>mlang/clear</code>: clear the buffer list (e.g. before working on another
 mlang doc)</p>
 </div>
+<div class="paragraph">
+<p><code>run-multilang</code>: how to run multilang on your system</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+You need to edit this function so that it runs multilang on your system
+</td>
+</tr>
+</table>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>//el
@@ -501,8 +516,24 @@ mlang doc)</p>
 //el (defun mlang/clear ()
 //el   (interactive)
 //el   (setq mlang/buffers '()))
+//el
+//el ;; how to call the Scala multilang executable on your system, with
+//el ;; argument filename fn; FIXME EDIT THIS FOR YOUR LOCAL INSTALLATION
+//el (defun run-multilang (fn)
+//el   (interactive "P")
+//el   (format "runsc Multilang %s" fn))
+//el ;; you probably want: (format "multilang %s" fn)
 //el</pre>
 </div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_save_hook">Save hook // ----------------------------------------</h3>
+<div class="paragraph">
+<p>On save, we run <code>Multilang</code> to propagate changes, and then revert all
+buffers in <code>mlang/buffers</code>. Note that we need the scala code
+<code>Multilang.scala</code>, and some way to run it (here we use a local <code>runsc</code>
+file, but you should use your own alternative).</p>
 </div>
 <div class="paragraph">
 <p><code>mlang/revert</code>: revert all buffers in <code>mlang/buffers</code>.</p>
@@ -517,26 +548,12 @@ mlang doc)</p>
 //el      (with-current-buffer x
 //el        (revert-buffer nil t)))
 //el    mlang/buffers))
-//el</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_save_hook">Save hook // ----------------------------------------</h3>
-<div class="paragraph">
-<p>On save, we run <code>Multilang</code> to propagate changes, and then revert all
-buffers in <code>mlang/buffers</code>. Note that we need the scala code
-<code>Multilang.scala</code>, and some way to run it (here we use a local <code>runsc</code>
-file, but you should use your own alternative).</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>//el
+//el
 //el (defun mlang/hook ()
 //el   (interactive)
 //el   (let*
-//el       ((bn (buffer-name)) ;; assume name of file
-//el        (cmd (format "runsc Multilang %s" bn))
+//el       (
+//el        (cmd (run-multilang (file-name-nondirectory (buffer-file-name))))
 //el        ) ;; let-binds
 //el     (progn
 //el       (message cmd)
@@ -642,6 +659,11 @@ file, but you should use your own alternative).</p>
 ;;adoc `mlang/clear`: clear the buffer list (e.g. before working on another
 ;;adoc mlang doc)
 ;;adoc
+;;adoc `run-multilang`: how to run multilang on your system
+;;adoc
+;;adoc [WARNING]
+;;adoc You need to edit this function so that it runs multilang on your system
+;;adoc
 ;;adoc ----
 
 (defvar mlang/buffers '())
@@ -650,7 +672,21 @@ file, but you should use your own alternative).</p>
   (interactive)
   (setq mlang/buffers '()))
 
+;; how to call the Scala multilang executable on your system, with
+;; argument filename fn; FIXME EDIT THIS FOR YOUR LOCAL INSTALLATION
+(defun run-multilang (fn)
+  (interactive "P")
+  (format "runsc Multilang %s" fn))
+;; you probably want: (format "multilang %s" fn)
+
 ;;adoc ----
+;;adoc
+;;adoc === Save hook // ----------------------------------------
+;;adoc
+;;adoc On save, we run `Multilang` to propagate changes, and then revert all
+;;adoc buffers in `mlang/buffers`. Note that we need the scala code
+;;adoc `Multilang.scala`, and some way to run it (here we use a local `runsc`
+;;adoc file, but you should use your own alternative).
 ;;adoc
 ;;adoc `mlang/revert`: revert all buffers in `mlang/buffers`.
 ;;adoc
@@ -664,22 +700,11 @@ file, but you should use your own alternative).</p>
        (revert-buffer nil t)))
    mlang/buffers))
 
-;;adoc ----
-;;adoc
-;;adoc === Save hook // ----------------------------------------
-;;adoc
-;;adoc On save, we run `Multilang` to propagate changes, and then revert all
-;;adoc buffers in `mlang/buffers`. Note that we need the scala code
-;;adoc `Multilang.scala`, and some way to run it (here we use a local `runsc`
-;;adoc file, but you should use your own alternative).
-;;adoc
-;;adoc ----
-
 (defun mlang/hook ()
   (interactive)
   (let*
-      ((bn (buffer-name)) ;; assume name of file
-       (cmd (format "runsc Multilang %s" bn))
+      (
+       (cmd (run-multilang (file-name-nondirectory (buffer-file-name))))
        ) ;; let-binds
     (progn
       (message cmd)
@@ -726,7 +751,7 @@ file, but you should use your own alternative).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-12 17:08:43 BST
+Last updated 2016-09-13 10:18:22 BST
 </div>
 </div>
 </body>

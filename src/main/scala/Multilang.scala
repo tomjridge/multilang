@@ -40,6 +40,7 @@ object Multilang {
     val ext = special_ext(from,s)
     val m = (from.start+ext+" ").length // assumes ext followed by space
     val n = (from.end).length
+    assert(s.length >= m+n)
     s.substring(m).dropRight(n)
   }
 
@@ -109,7 +110,12 @@ object Multilang {
     val (base,ext) = split_filename(fn)
 
     // which languages are we working with?
-    val from=langs.find(l => l.ext == ext).get
+    val from= {
+      val opt = langs.find(l => l.ext == ext)
+      if (opt==None) 
+        failwith("failed to find .multilang entry for extension "+ext);
+      opt.get
+    }
     val tos = langs.filter(l => { (l != from) && base_to_exts(base).contains(l.ext) })
     //println(s"tos : $tos")
     // for each (from,to), run main
