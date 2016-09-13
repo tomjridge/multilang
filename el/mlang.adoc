@@ -78,10 +78,11 @@ You need to edit this function so that it runs multilang on your system
 //el 
 //el ;; how to call the Scala multilang executable on your system, with
 //el ;; argument filename fn; FIXME EDIT THIS FOR YOUR LOCAL INSTALLATION
-//el (defun run-multilang (fn)
-//el   (interactive "P")
-//el   (format "runsc Multilang %s" fn))
-//el ;; you probably want: (format "multilang %s" fn)
+//el (defun run-multilang (b)
+//el   (interactive "bBuffer:")
+//el   (shell-command 
+//el    (format "runsc Multilang %s" ;; FIXME you want "multilang %s"
+//el            (file-name-nondirectory (buffer-file-name (get-buffer b)))))) ;; fixme long-winded?
 //el 
 ----
 
@@ -106,15 +107,11 @@ file, but you should use your own alternative).
 //el 
 //el (defun mlang/hook ()
 //el   (interactive)
-//el   (let* 
-//el       (
-//el        (cmd (run-multilang (file-name-nondirectory (buffer-file-name))))
-//el        ) ;; let-binds
-//el     (progn
-//el       (message cmd)
-//el       (shell-command cmd)
-//el       (mlang/revert)
-//el       (mlang/add-hook)))) ;; having reverted, we need to re-add the hook
+//el   (progn
+//el     (message "mlang/hook")
+//el     (run-multilang (current-buffer))
+//el     (mlang/revert)
+//el     (mlang/add-hook))) ;; having reverted, we need to re-add the hook
 //el 
 ----
 

@@ -78,10 +78,11 @@
 
 ;; how to call the Scala multilang executable on your system, with
 ;; argument filename fn; FIXME EDIT THIS FOR YOUR LOCAL INSTALLATION
-(defun run-multilang (fn)
-  (interactive "P")
-  (format "runsc Multilang %s" fn))
-;; you probably want: (format "multilang %s" fn)
+(defun run-multilang (b)
+  (interactive "bBuffer:")
+  (shell-command 
+   (format "runsc Multilang %s" ;; FIXME you want "multilang %s"
+           (file-name-nondirectory (buffer-file-name (get-buffer b)))))) ;; fixme long-winded?
 
 ;;adoc ----
 ;;adoc 
@@ -106,15 +107,11 @@
 
 (defun mlang/hook ()
   (interactive)
-  (let* 
-      (
-       (cmd (run-multilang (file-name-nondirectory (buffer-file-name))))
-       ) ;; let-binds
-    (progn
-      (message cmd)
-      (shell-command cmd)
-      (mlang/revert)
-      (mlang/add-hook)))) ;; having reverted, we need to re-add the hook
+  (progn
+    (message "mlang/hook")
+    (run-multilang (current-buffer))
+    (mlang/revert)
+    (mlang/add-hook))) ;; having reverted, we need to re-add the hook
 
 ;;adoc ----
 ;;adoc 
